@@ -1,3 +1,5 @@
+import { Square } from 'chess.js'
+
 export enum WhitePieces {
   K = '&#9812;',
   Q = '&#9813;',
@@ -24,4 +26,14 @@ export enum Colors {
 export enum GameTypes {
   RANDOM_COMPUTER = 'RANDOM_COMPUTER',
   HUMAN = 'HUMAN',
+};
+
+export enum Turn {
+  W = 'W',
+  B = 'B',
+};
+
+export type Move = {
+  sourceSquare: Square,
+  targetSquare: Square,
 };

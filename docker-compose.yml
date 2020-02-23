@@ -1,0 +1,45 @@
+version: '3.3'
+
+services:
+    redis:
+        image: 'redis:latest'
+        ports:
+            - '6379:6379'
+
+    backend:
+        build:
+          context: backend
+          dockerfile: Dockerfile
+        command: python manage.py runserver 0.0.0.0:8000
+        ports:
+          - "8000:8000"
+        environment:
+          PYTHONPATH: .
+          DATABASE_URL: 'postgresql://postgres:d788cb08-f2bf-4e45-8930-e0f99b53970d@db/syslog'
+          PGPASSWORD: d788cb08-f2bf-4e45-8930-e0f99b53970d
+          SESSION_SECRET_KEY: 04d6cdc86a7144f399fcfed856da4d4e65e603db5ede
+          GITHUB_CLIENT_ID: 'f92e3468b5b4fdb74951'
+          GITHUB_CLIENT_SECRET: 'cdd85bdcd606b0f486da858326c23b66305118b6'
+          FRONTEND_SERVER: 'http://localhost:3000'
+    
+        volumes:
+          - ./backend/:/app/:cached
+          - ./.docker/.ipython:/root/.ipython:cached
+
+        depends_on:
+            - redis
+    
+    frontend:
+        build:
+            context: frontend
+            dockerfile: Dockerfile
+        volumes:
+            - './frontend:/app:cached'
+            - '/app/node_modules'
+        ports:
+            - '3000:3000'
+        environment:
+            - NODE_ENV=development
+            - CHOKIDAR_USEPOLLING=true
+
+

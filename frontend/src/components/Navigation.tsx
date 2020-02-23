@@ -10,6 +10,7 @@ const useStyles = makeStyles({
   buttons: {
     color: 'grey',
     fontSize: '20px',
+    marginRight: '10px',
   },
   title: {
     color: 'grey',
@@ -24,6 +25,7 @@ const Navigation: FC = () => {
     <AppBar className={classes.appBar} position="static">
       <Toolbar>
         <Typography variant="h4" className={classes.title}>Chess.io</Typography>
+        <Button className={classes.buttons}>Register</Button>
         <Button className={classes.buttons}>Login</Button>
       </Toolbar>
     </AppBar>

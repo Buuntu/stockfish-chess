@@ -1,8 +1,9 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useState, useEffect } from 'react';
 import {
-  Paper, makeStyles, Typography, TextField, Container, Grid, Button
+  Paper, makeStyles, Typography, TextField, Container, Grid, Button,
 } from '@material-ui/core';
-import openSocket from 'socket.io-client';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import { Colors } from '../types';
 
 const useStyles = makeStyles({
   chatRoom: {
@@ -32,20 +33,47 @@ const useStyles = makeStyles({
   },
   resize: {
     fontSize: '20px',
+  },
+  messages: {
+    textAlign: 'left',
+  },
+  messageIcon: {
+    marginRight: '5px',
   }
 });
 
-const socket = openSocket('ws://localhost:8000/chat/test/');
+type ChatRoomProps = {
+  gameId?: number,
+  socket: WebSocket,
+  color: Colors,
+}
 
-export const ChatRoom: FC = () => {
+export const ChatRoom: FC<ChatRoomProps> = ({ gameId, socket, color }) => {
   const classes = useStyles();
 
-  const [message, setMessage] = useState<string>();
+  const [message, setMessage] = useState<string>('');
+  const [sentMessages, setSentMessages] = useState<string[]>([]);
+
+  const parseMessage = (data: {message: string}) => {
+    setSentMessages([...sentMessages, data['message']]);
+  }
+
+  useEffect(() => {
+    setSentMessages([]);
+  }, [gameId])
+
+  socket.onmessage = (e) => {
+    const data = JSON.parse(e.data);
+    if ('message' in data) {
+      parseMessage(data);
+    }
+  };
 
   const keyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter') {
-      setMessage('');
       //send message here
+      socket.send(JSON.stringify({'message': message, 'color': color}));
+      setMessage('');
     }
   }
 
@@ -56,8 +84,21 @@ export const ChatRoom: FC = () => {
 
   return (
     <Paper elevation={7} className={classes.chatRoom}>
-      <Typography variant="h6">Chat Room</Typography>
-      <Container className={classes.output}/>
+      <Typography variant="h6">Chat Room {gameId ? `#${gameId}` : null}</Typography>
+      <Container className={classes.output}>
+        {sentMessages.map((message, idx) => {
+          return (
+            <Grid key={idx} container>
+              <Grid item>
+                <AccountCircleIcon className={classes.messageIcon}></AccountCircleIcon>
+              </Grid>
+              <Grid item>
+                <Typography className={classes.messages}>{message}</Typography>
+              </Grid>
+            </Grid>
+          );
+        })}
+      </Container>
       <Grid container>
         <Grid item>
         <TextField
