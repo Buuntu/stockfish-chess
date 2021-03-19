@@ -15,7 +15,7 @@ daphne==2.4.1
 Django==3.0.2
 django-cors-headers==3.2.1
 django-rest-framework==0.1.0
-djangorestframework==3.11.0
+djangorestframework==3.11.2
 entrypoints==0.3
 flake8==3.7.9
 hyperlink==19.0.0
