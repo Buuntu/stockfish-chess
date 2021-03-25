@@ -39,7 +39,7 @@ pyOpenSSL==19.1.0
 python-engineio==3.11.2
 python-socketio==4.4.0
 pytz==2019.3
-PyYAML==5.3
+PyYAML==5.4
 redis==2.10.6
 service-identity==18.1.0
 six==1.13.0
