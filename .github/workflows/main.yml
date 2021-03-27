@@ -45,9 +45,8 @@ jobs:
         shell: bash
 
       - name: Lint with Black
-        uses: lgeiger/black-action@master
-        with:
-          args: "backend --check --line-length 79"
+        run: |
+          black backend --check --line-length 80
 
       - name: Test with pytest
         run: |
