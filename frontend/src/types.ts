@@ -1,4 +1,4 @@
-import { Square } from 'chess.js'
+import { Square } from 'chess.js';
 
 export enum WhitePieces {
   K = '&#9812;',
@@ -7,7 +7,7 @@ export enum WhitePieces {
   N = '&#9816;',
   B = '&#9815;',
   P = '&#9817;',
-};
+}
 
 export enum BlackPieces {
   K = '&#9818;',
@@ -16,24 +16,24 @@ export enum BlackPieces {
   B = '&#9821;',
   N = '&#9822;',
   P = '&#9823;',
-};
+}
 
 export enum Colors {
   WHITE = 'WHITE',
   BLACK = 'BLACK',
-};
+}
 
 export enum GameTypes {
   STOCKFISH_ENGINE = 'STOCKFISH_ENGINE',
   HUMAN = 'HUMAN',
-};
+}
 
 export enum Turn {
   W = 'W',
   B = 'B',
-};
+}
 
 export type Move = {
-  sourceSquare: Square,
-  targetSquare: Square,
+  sourceSquare: Square;
+  targetSquare: Square;
 };
