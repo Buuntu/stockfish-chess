@@ -6,12 +6,11 @@ import asyncio
 
 game_router = r = APIRouter()
 
+
 @r.get(
     "/game",
 )
-async def game(
-    board: str
-):
+async def game(board: str):
     """
     Calculate next move based on current board
     """
