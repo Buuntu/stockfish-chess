@@ -1,4 +1,6 @@
-# stockfish-chess
+# Stockfish Chess
+
+A chess game using FastAPI and React to play against the Stockfish engine.
 
 ## Features
 
