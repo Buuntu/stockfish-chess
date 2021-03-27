@@ -6,11 +6,11 @@ A chess game using FastAPI and React to play against the Stockfish engine.
 
 - **FastAPI** with Python 3.8
 - **React 16** with Typescript
-- Postgres
+- Postgresql
 - SqlAlchemy with Alembic for migrations
 - Pytest for backend tests
 - Jest for frontend tests
-- Perttier
+- Prettier/Black for linting
 - Docker compose for easier development
 - Nginx as a reverse proxy to allow backend and frontend on the same port
 

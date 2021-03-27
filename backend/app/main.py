@@ -29,6 +29,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.middleware("http")
 async def db_session_middleware(request: Request, call_next):
     request.state.db = SessionLocal()
