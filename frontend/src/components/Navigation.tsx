@@ -24,7 +24,7 @@ const Navigation: FC = () => {
   return (
     <AppBar className={classes.appBar} position="static">
       <Toolbar>
-        <Typography variant="h4" className={classes.title}>Chess.io</Typography>
+        <Typography variant="h4" className={classes.title}>Stockfish Chess</Typography>
         <Button className={classes.buttons}>Register</Button>
         <Button className={classes.buttons}>Login</Button>
       </Toolbar>
