@@ -2,7 +2,6 @@ import React, { FC, useState, useEffect } from 'react';
 import Chessboard from 'chessboardjsx';
 import { makeStyles } from '@material-ui/core/styles';
 import { Button, Grid } from '@material-ui/core';
-import { useQueryParam, NumberParam } from 'use-query-params';
 import { ChessInstance } from 'chess.js';
 import axios from 'axios';
 
@@ -33,7 +32,7 @@ const Game: FC = () => {
   const [fen, setFen] = useState('start');
   const [gameType, setGameType] = useState<GameTypes | null>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
-  const [gameId, setGameId] = useQueryParam('game', NumberParam);
+  const [gameId, setGameId] = useState<number>(1);
   const [socket, setSocket] = useState(
     new WebSocket('ws://localhost:8000/ws/chat/guest/')
   );
