@@ -48,4 +48,5 @@ jobs:
           pytest -v
         working-directory: backend
         env:
+          PYTHONUNBUFFERED: 1
           DATABASE_URL: postgresql://postgres:postgres@localhost/postgres
