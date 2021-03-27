@@ -44,8 +44,8 @@ jobs:
         shell: bash
 
       - name: Test with pytest
-        run: |
-          python3 -m pytest
+        command: >
+          pytest
         working-directory: backend
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost/postgres
