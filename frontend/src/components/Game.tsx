@@ -4,13 +4,14 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Button, Grid } from '@material-ui/core';
 import { useQueryParam, NumberParam } from 'use-query-params';
 import { ChessInstance } from 'chess.js';
-import {
-  GameTypes, Turn, Colors, Move,
-} from '../types';
+import axios from 'axios';
+
+import { GameTypes, Turn, Colors, Move } from '../types';
 import JoinGameDialog from './JoinGameDialog';
 import ChatRoom from './ChatRoom';
+import { BACKEND_URL } from '../constants';
 
-const ChessReq:any = require('chess.js');
+const ChessReq: any = require('chess.js');
 
 const useStyles = makeStyles({
   board: {
@@ -34,7 +35,7 @@ const Game: FC = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [gameId, setGameId] = useQueryParam('game', NumberParam);
   const [socket, setSocket] = useState(
-    new WebSocket('ws://localhost:8000/ws/chat/guest/'),
+    new WebSocket('ws://localhost:8000/ws/chat/guest/')
   );
 
   const randomMove = (): string | null => {
@@ -46,23 +47,28 @@ const Game: FC = () => {
     return null;
   };
 
+  const getNextMove = async () => {
+    const response = await axios.get(`${BACKEND_URL}/game`, {
+      params: { board: game.fen() },
+    });
+
+    setFen(response.data);
+    game.load(response.data);
+    setTurn(Turn.W);
+  };
+
   useEffect(() => {
     // Changing to a new game
-    console.log(gameId);
-    setSocket(new WebSocket(`ws://localhost:8000/ws/chat/${gameId}/`));
+    //setSocket(new WebSocket(`ws://localhost:8000/ws/chat/${gameId}/`));
     // fetch game state from db
   }, [gameId]);
 
   useEffect(() => {
     if (game.game_over()) return;
 
-    if (gameType === GameTypes.RANDOM_COMPUTER && turn === Turn.B) {
-      setTimeout(() => {
-        const newFen = randomMove();
-        if (!newFen) return; // no more legal moves
-        setTurn(Turn.W);
-        setFen(newFen);
-      }, 500);
+    if (gameType === GameTypes.STOCKFISH_ENGINE && turn === Turn.B) {
+      // fetch next move from backend
+      getNextMove();
     }
   }, [turn, game, gameType]);
 
@@ -102,7 +108,7 @@ const Game: FC = () => {
       <Grid item>
         <div>
           <div className={classes.board}>
-          <Chessboard
+            <Chessboard
               position={fen}
               onDrop={onDrop}
               transitionDuration={300}
@@ -113,7 +119,7 @@ const Game: FC = () => {
             <Button
               className={classes.button}
               variant="contained"
-              onClick={() => setGameType(GameTypes.RANDOM_COMPUTER)}
+              onClick={() => setGameType(GameTypes.STOCKFISH_ENGINE)}
             >
               Play a Computer
             </Button>

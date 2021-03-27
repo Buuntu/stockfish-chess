@@ -24,7 +24,7 @@ export enum Colors {
 };
 
 export enum GameTypes {
-  RANDOM_COMPUTER = 'RANDOM_COMPUTER',
+  STOCKFISH_ENGINE = 'STOCKFISH_ENGINE',
   HUMAN = 'HUMAN',
 };
 
