@@ -1,4 +1,4 @@
-name: CI Testing
+name: tests
 on: push
 
 jobs:
@@ -50,4 +50,15 @@ jobs:
         env:
           PYTHONUNBUFFERED: 1
           DATABASE_URL: postgresql://postgres:postgres@localhost/postgres
-        shell: bash
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Test using Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "14"
+      - run: npm install
+      - run: npm run test:ci
