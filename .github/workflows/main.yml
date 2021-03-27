@@ -50,3 +50,4 @@ jobs:
         env:
           PYTHONUNBUFFERED: 1
           DATABASE_URL: postgresql://postgres:postgres@localhost/postgres
+        shell: bash
