@@ -20,4 +20,6 @@ async def game(
     result = engine.play(b, chess.engine.Limit(time=0.5))
     b.push(result.move)
 
+    engine.quit()
+
     return b.fen()
