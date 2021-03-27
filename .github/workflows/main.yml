@@ -41,8 +41,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r backend/requirements/base.txt
-          pip install -r backend/requiements/dev.txt
+          pip install -r backend/requirements/dev.txt
         shell: bash
+
+      - name: Lint with Black
+        uses: lgeiger/black-action@master
+        with:
+          args: "backend --check --line-length 79"
 
       - name: Test with pytest
         run: |
@@ -67,6 +72,11 @@ jobs:
           npm install
         env:
           CI: true
+
+      - name: Prettify code
+        uses: creyD/prettier_action@v2.2
+        with:
+          prettier_options: --write **/*.{ts,tsx,md}
 
       - name: Test
         run: |
