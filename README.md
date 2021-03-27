@@ -1,4 +1,4 @@
-# Stockfish Chess
+# Stockfish Chess [![tests](https://github.com/Buuntu/stockfish-chess/actions/workflows/main.yml/badge.svg)](https://github.com/Buuntu/stockfish-chess/actions/workflows/main.yml)
 
 A chess game using FastAPI and React to play against the Stockfish engine.
 

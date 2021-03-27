@@ -1,4 +1,4 @@
-version: '3.7'
+version: "3.7"
 services:
   nginx:
     image: nginx:1.17
@@ -22,7 +22,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data:cached
 
@@ -32,11 +32,11 @@ services:
       dockerfile: Dockerfile
     command: celery --app app.tasks worker --loglevel=DEBUG -Q main-queue -c 1
 
-  flower:  
+  flower:
     image: mher/flower
     command: flower --broker=redis://redis:6379/0 --port=5555
-    ports:  
-        - 5555:5555
+    ports:
+      - 5555:5555
     depends_on:
       - "redis"
 
@@ -51,7 +51,7 @@ services:
       - ./.docker/.ipython:/root/.ipython:cached
     environment:
       PYTHONPATH: .
-      DATABASE_URL: 'postgresql://postgres:password@postgres:5432/postgres'
+      DATABASE_URL: "postgresql://postgres:password@postgres:5432/postgres"
     depends_on:
       - "postgres"
 
@@ -59,13 +59,12 @@ services:
     build:
       context: frontend
       dockerfile: Dockerfile
+    command: /frontend/app/run.sh start
     stdin_open: true
     volumes:
-      - './frontend:/app:cached'
-      - './frontend/node_modules:/app/node_modules:cached'
+      - "./frontend:/app:cached"
     environment:
       - NODE_ENV=development
-
 
 volumes:
   db-data:

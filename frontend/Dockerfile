@@ -1,16 +1,12 @@
-FROM node:12
+FROM node:14
 
-ADD package.json /package.json
+EXPOSE 8000 35729
+WORKDIR /frontend
+ENV NODE_PATH=/frontend/node_modules
+ENV PATH=$PATH:/frontend/node_modules/.bin
 
-ENV NODE_PATH=/node_modules
-ENV PATH=$PATH:/node_modules/.bin
+COPY package.json /frontend
 RUN npm install
+WORKDIR /frontend/app
 
-WORKDIR /app
-ADD . /app
-
-EXPOSE 8000
-EXPOSE 35729
-
-ENTRYPOINT ["/bin/bash", "/app/run.sh"]
-CMD ["start"]
+COPY ./ /frontend/app
