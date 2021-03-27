@@ -7,12 +7,9 @@ case $1 in
     npm start | cat
     ;;
   build)
-    npm build
-    ;;
-  test)
-    npm test $@
+    npm run-script build
     ;;
   *)
-    npm "$@"
+    exec $@
     ;;
 esac
