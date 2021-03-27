@@ -20,14 +20,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up Python 3.8
+      - name: Set up Python 3.9
         uses: actions/setup-python@v2
         with:
-          python-version: "3.8"
-
-      - name: Install stockfish
-        run: |
-          sudo apt-get -y install stockfish
+          python-version: 3.9
 
       - uses: actions/cache@v2
         with:
@@ -35,7 +31,11 @@ jobs:
             ~/.cache/pip
             ~/.local/bin
             ~/.local/lib
-          key: ${{ runner.os }}-pip-v4-${{ hashFiles('backend/requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements.txt') }}
+
+      - name: Install stockfish
+        run: |
+          sudo apt-get -y install stockfish
 
       - name: Install requirements
         run: |
@@ -44,7 +44,7 @@ jobs:
         shell: bash
 
       - name: Test with pytest
-        command: >
+        run: |
           pytest
         working-directory: backend
         env:
