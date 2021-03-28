@@ -6,8 +6,7 @@ import { ChessInstance } from 'chess.js';
 import axios from 'axios';
 
 import { GameTypes, Turn, Colors, Move } from 'types';
-import JoinGameDialog from 'components/JoinGameDialog';
-import ChatRoom from 'components/ChatRoom';
+import { JoinGameDialog, GameLobby } from 'components';
 import { BACKEND_URL } from '../utils/config';
 
 const ChessReq: any = require('chess.js');
@@ -144,7 +143,7 @@ const Game: FC = () => {
         </div>
       </Grid>
       <Grid item>
-        <ChatRoom gameId={gameId} socket={socket} color={Colors.WHITE} />
+        <GameLobby />
       </Grid>
     </Grid>
   );

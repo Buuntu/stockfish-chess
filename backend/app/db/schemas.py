@@ -43,3 +43,8 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     email: str = None
     permissions: str = "user"
+
+
+class Publish(BaseModel):
+    channel: str = "lobby"
+    message: str
