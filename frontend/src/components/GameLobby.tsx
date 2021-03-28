@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Paper, makeStyles, Typography, Container } from '@material-ui/core';
 
 const useStyles = makeStyles({
@@ -20,6 +20,10 @@ const useStyles = makeStyles({
 export const GameLobby = () => {
   const classes = useStyles();
   const games: any = [];
+
+  const [websocket, setWebsocket] = useState(
+    new WebSocket('ws://localhost:8000/api/ws')
+  );
 
   return (
     <Paper elevation={7} className={classes.gameLobby}>
