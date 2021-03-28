@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React from 'react';
 import {
   AppBar,
   Toolbar,
@@ -6,6 +6,8 @@ import {
   makeStyles,
   Typography,
 } from '@material-ui/core';
+
+import { useHistory } from 'react-router';
 
 const useStyles = makeStyles({
   appBar: {
@@ -25,16 +27,28 @@ const useStyles = makeStyles({
   },
 });
 
-const Navigation: FC = () => {
+const Navigation = () => {
   const classes = useStyles();
+  const history = useHistory();
+
   return (
     <AppBar className={classes.appBar} position="static">
       <Toolbar>
         <Typography variant="h4" className={classes.title}>
           Stockfish Chess
         </Typography>
-        <Button className={classes.buttons}>Register</Button>
-        <Button className={classes.buttons}>Login</Button>
+        <Button
+          className={classes.buttons}
+          onClick={() => history.push('/register')}
+        >
+          Register
+        </Button>
+        <Button
+          className={classes.buttons}
+          onClick={() => history.push('/login')}
+        >
+          Login
+        </Button>
       </Toolbar>
     </AppBar>
   );
