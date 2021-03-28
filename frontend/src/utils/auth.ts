@@ -1,5 +1,7 @@
 import decodeJwt from 'jwt-decode';
 
+import { AUTH_URL } from 'utils/config';
+
 export const isAuthenticated = () => {
   const permissions = localStorage.getItem('permissions');
   if (!permissions) {
@@ -26,7 +28,7 @@ export const login = async (email: string, password: string) => {
   formData.append('username', email);
   formData.append('password', password);
 
-  const request = new Request('/api/token', {
+  const request = new Request(`${AUTH_URL}/token`, {
     method: 'POST',
     body: formData,
   });
