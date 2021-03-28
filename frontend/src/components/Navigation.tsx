@@ -1,40 +1,76 @@
-import React, { FC } from 'react';
+import React from 'react';
 import {
   AppBar,
   Toolbar,
   Button,
   makeStyles,
   Typography,
+  Box,
 } from '@material-ui/core';
+import { useHistory } from 'react-router';
+
+import { isAuthenticated, logout } from 'utils/auth';
 
 const useStyles = makeStyles({
   appBar: {
+    justifyContent: 'space-between',
     background: 'transparent',
     boxShadow: 'none',
-    flex: 1,
   },
   buttons: {
     color: 'grey',
     fontSize: '20px',
-    marginRight: '10px',
   },
   title: {
     color: 'grey',
-    flex: 1,
-    paddingLeft: '60px',
+    flexGrow: 3,
+  },
+  actions: {
+    width: '240px',
   },
 });
 
-const Navigation: FC = () => {
+const Navigation = () => {
   const classes = useStyles();
+  const history = useHistory();
+
+  const handleLogout = () => {
+    logout();
+    history.push('/');
+  };
+
   return (
     <AppBar className={classes.appBar} position="static">
       <Toolbar>
         <Typography variant="h4" className={classes.title}>
           Stockfish Chess
         </Typography>
-        <Button className={classes.buttons}>Register</Button>
-        <Button className={classes.buttons}>Login</Button>
+        <Box
+          display="flex"
+          className={classes.actions}
+          justifyContent="flex-end"
+        >
+          {isAuthenticated() ? (
+            <Button className={classes.buttons} onClick={() => handleLogout()}>
+              Logout
+            </Button>
+          ) : (
+            <>
+              <Button
+                className={classes.buttons}
+                onClick={() => history.push('/register')}
+              >
+                Register
+              </Button>
+              <Button
+                className={classes.buttons}
+                onClick={() => history.push('/login')}
+              >
+                Login
+              </Button>
+            </>
+          )}
+        </Box>
       </Toolbar>
     </AppBar>
   );

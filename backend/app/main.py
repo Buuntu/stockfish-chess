@@ -25,6 +25,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
+    expose_headers=["Content-Range"],
     allow_methods=["*"],
     allow_headers=["*"],
 )

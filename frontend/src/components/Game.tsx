@@ -5,10 +5,10 @@ import { Button, Grid } from '@material-ui/core';
 import { ChessInstance } from 'chess.js';
 import axios from 'axios';
 
-import { GameTypes, Turn, Colors, Move } from '../types';
-import JoinGameDialog from './JoinGameDialog';
-import ChatRoom from './ChatRoom';
-import { BACKEND_URL } from '../constants';
+import { GameTypes, Turn, Colors, Move } from 'types';
+import JoinGameDialog from 'components/JoinGameDialog';
+import ChatRoom from 'components/ChatRoom';
+import { BACKEND_URL } from '../utils/config';
 
 const ChessReq: any = require('chess.js');
 

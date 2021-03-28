@@ -2,6 +2,8 @@
 
 A chess game using FastAPI and React to play against the Stockfish engine.
 
+![chess board](img/board.png)
+
 ## Features
 
 - **FastAPI** with Python 3.8
