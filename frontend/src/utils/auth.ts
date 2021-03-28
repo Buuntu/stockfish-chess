@@ -86,7 +86,7 @@ export const signUp = async (
   formData.append('username', email);
   formData.append('password', password);
 
-  const request = new Request('/api/signup', {
+  const request = new Request(`${AUTH_URL}/signup`, {
     method: 'POST',
     body: formData,
   });
