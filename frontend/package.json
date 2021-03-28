@@ -17,6 +17,7 @@
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^4.0.3",
+    "reconnecting-websocket": "^4.4.0",
     "standard": "^16.0.3"
   },
   "scripts": {

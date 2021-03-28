@@ -8,6 +8,8 @@ import axios from 'axios';
 import { GameTypes, Turn, Colors, Move } from 'types';
 import { JoinGameDialog, GameLobby } from 'components';
 import { BACKEND_URL } from '../utils/config';
+import ReconnectingWebSocket from 'reconnecting-websocket';
+import { GameType } from './types';
 
 const ChessReq: any = require('chess.js');
 
@@ -23,18 +25,23 @@ const useStyles = makeStyles({
   },
 });
 
-const Game: FC = () => {
+export const Game: FC = () => {
   const classes = useStyles();
 
   const [game, setGame] = useState<ChessInstance>(new ChessReq());
   const [turn, setTurn] = useState<Turn>(Turn.W);
   const [fen, setFen] = useState('start');
   const [gameType, setGameType] = useState<GameTypes | null>(null);
+  const [activeGames, setActiveGames] = useState<GameType[]>([]);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [gameId, setGameId] = useState<number>(1);
-  const [socket, setSocket] = useState(
-    new WebSocket('ws://localhost:8000/ws/chat/guest/')
-  );
+  const [socket, setSocket] = useState<ReconnectingWebSocket | null>(null);
+
+  useEffect(() => {
+    if (!socket) {
+      setSocket(new ReconnectingWebSocket('ws://localhost:8000/api/ws/lobby'));
+    }
+  }, [socket]);
 
   const randomMove = (): string | null => {
     const moves = game.moves();
@@ -99,7 +106,35 @@ const Game: FC = () => {
 
     // generate unique ID for game (should check that it doesn't already exist)
     setGameId(Math.floor(Math.random() * 1000));
+
+    if (socket) {
+      console.log('sending message');
+      socket.send(JSON.stringify({ type: 'NEW_GAME', data: { id: gameId } }));
+    }
   };
+
+  if (socket) {
+    socket.onopen = () => {
+      // on connecting, do nothing but log it to the console
+      console.log('connected');
+    };
+
+    socket.onclose = () => {
+      console.log('disconnected');
+      // automatically try to reconnect on connection loss
+    };
+
+    socket.onmessage = function (e) {
+      const server_message = JSON.parse(e.data);
+      console.log(server_message);
+
+      switch (server_message.type) {
+        case 'NEW_GAME':
+          setActiveGames([...activeGames, { id: server_message?.data?.id }]);
+      }
+      return false;
+    };
+  }
 
   return (
     <Grid container justify="center">
@@ -143,10 +178,8 @@ const Game: FC = () => {
         </div>
       </Grid>
       <Grid item>
-        <GameLobby />
+        <GameLobby websocket={socket} games={activeGames} />
       </Grid>
     </Grid>
   );
 };
-
-export default Game;

@@ -30,7 +30,7 @@ const useStyles = makeStyles({
   },
 });
 
-const Navigation = () => {
+export const Navigation = () => {
   const classes = useStyles();
   const history = useHistory();
 
@@ -75,5 +75,3 @@ const Navigation = () => {
     </AppBar>
   );
 };
-
-export default Navigation;

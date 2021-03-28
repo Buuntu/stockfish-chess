@@ -1,7 +1,5 @@
 import { Grid } from '@material-ui/core';
-import Game from 'components/Game';
-import Navigation from 'components/Navigation';
-import React from 'react';
+import { Game, Navigation } from 'components';
 
 export const Board = () => {
   return (

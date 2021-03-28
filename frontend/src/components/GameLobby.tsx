@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
 import { Paper, makeStyles, Typography, Container } from '@material-ui/core';
+import ReconnectingWebSocket from 'reconnecting-websocket';
+import { ActiveGame } from './ActiveGame';
+import { GameType } from './types';
 
 const useStyles = makeStyles({
   gameLobby: {
@@ -17,20 +19,20 @@ const useStyles = makeStyles({
   },
 });
 
-export const GameLobby = () => {
-  const classes = useStyles();
-  const games: any = [];
+type GameLobbyType = {
+  websocket: ReconnectingWebSocket | null;
+  games: GameType[];
+};
 
-  const [websocket, setWebsocket] = useState(
-    new WebSocket('ws://localhost:8000/api/ws')
-  );
+export const GameLobby = ({ websocket, games }: GameLobbyType) => {
+  const classes = useStyles();
 
   return (
     <Paper elevation={7} className={classes.gameLobby}>
       <Typography variant="h6">Game Lobby</Typography>
       <Container className={classes.output}>
         {games.length > 0 ? (
-          games.map((game: any) => game)
+          games.map((game) => <ActiveGame gameId={game.id} />)
         ) : (
           <Typography variant="body1">No active games availables</Typography>
         )}
