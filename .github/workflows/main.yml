@@ -73,9 +73,15 @@ jobs:
           CI: true
 
       - name: Prettify code
-        uses: creyD/prettier_action@v2.2
+        run: |
+          cd frontend/
+          npm run format
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4.1.2
         with:
-          prettier_options: --write **/*.{ts,tsx,md}
+          commit_message: Apply formatting changes
+          branch: ${{ github.head_ref }}
 
       - name: Test
         run: |

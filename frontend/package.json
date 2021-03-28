@@ -22,6 +22,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "CI=true react-scripts test",
+    "format": "prettier --write .",
     "eject": "react-scripts eject"
   },
   "browserslist": {
