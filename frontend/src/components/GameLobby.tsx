@@ -32,7 +32,7 @@ export const GameLobby = ({ websocket, games }: GameLobbyType) => {
       <Typography variant="h6">Game Lobby</Typography>
       <Container className={classes.output}>
         {games.length > 0 ? (
-          games.map((game) => <ActiveGame gameId={game.id} />)
+          games.map((game) => <ActiveGame key={game.id} gameId={game.id} />)
         ) : (
           <Typography variant="body1">No active games availables</Typography>
         )}
