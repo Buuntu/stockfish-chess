@@ -10,6 +10,7 @@ import {
 } from '@material-ui/core';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import { Colors } from '../types';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 const useStyles = makeStyles({
   chatRoom: {
@@ -50,7 +51,7 @@ const useStyles = makeStyles({
 
 type ChatRoomProps = {
   gameId?: number | null;
-  socket: WebSocket;
+  socket: ReconnectingWebSocket | null;
   color: Colors;
 };
 
@@ -68,17 +69,21 @@ export const ChatRoom: FC<ChatRoomProps> = ({ gameId, socket, color }) => {
     setSentMessages([]);
   }, [gameId]);
 
-  socket.onmessage = (e) => {
-    const data = JSON.parse(e.data);
-    if ('message' in data) {
-      parseMessage(data);
-    }
-  };
+  if (socket) {
+    socket.onmessage = (e) => {
+      const data = JSON.parse(e.data);
+      if ('message' in data) {
+        parseMessage(data);
+      }
+    };
+  }
 
   const keyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter') {
       //send message here
-      socket.send(JSON.stringify({ message: message, color: color }));
+      if (socket) {
+        socket.send(JSON.stringify({ message: message, color: color }));
+      }
       setMessage('');
     }
   };
@@ -132,5 +137,3 @@ export const ChatRoom: FC<ChatRoomProps> = ({ gameId, socket, color }) => {
     </Paper>
   );
 };
-
-export default ChatRoom;

@@ -26,7 +26,7 @@ type DialogProps = {
   onClose: Function;
 };
 
-const JoinGameDialog: FC<DialogProps> = ({ open, onClose }) => {
+export const JoinGameDialog: FC<DialogProps> = ({ open, onClose }) => {
   const classes = useStyles();
   const [gameId, setGameId] = useState<string>('');
   let history = useHistory();
@@ -63,5 +63,3 @@ const JoinGameDialog: FC<DialogProps> = ({ open, onClose }) => {
     </Dialog>
   );
 };
-
-export default JoinGameDialog;

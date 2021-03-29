@@ -1,3 +1,5 @@
 export * from './Login';
-export * from './Board';
+export * from './Layout';
 export * from './Register';
+export * from './Main';
+export * from './Game';

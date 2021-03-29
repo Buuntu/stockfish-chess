@@ -2,7 +2,6 @@ from fastapi import APIRouter, Request, Depends, Response, encoders
 import typing as t
 import chess
 import chess.engine
-import asyncio
 
 game_router = r = APIRouter()
 
