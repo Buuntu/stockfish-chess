@@ -39,7 +39,7 @@ export const Game: FC = () => {
 
   useEffect(() => {
     if (!socket) {
-      setSocket(new ReconnectingWebSocket('ws://localhost:8000/api/ws/lobby'));
+      setSocket(new ReconnectingWebSocket('ws://localhost:8000/api/ws/game'));
     }
   }, [socket]);
 

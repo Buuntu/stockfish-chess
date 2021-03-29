@@ -17,4 +17,4 @@ sqlalchemy-utils==0.36.8
 python-multipart==0.0.5
 pyjwt==1.7.1
 chess==1.4.0
-broadcaster==0.2.0
+broadcaster[redis]==0.2.0
