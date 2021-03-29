@@ -24,13 +24,22 @@ origins = [
 
 broadcast = Broadcast("memory://")
 
-async def chatroom_ws_receiver(websocket: WebSocket):
+async def chatroom_ws_receiver(websocket: WebSocket, game_id: int):
     async for message in websocket.iter_text():
-        await broadcast.publish(channel="chatroom", message=message)
+        await broadcast.publish(channel=f"game-{game_id}", message=message)
 
 
-async def chatroom_ws_sender(websocket: WebSocket):
-    async with broadcast.subscribe(channel="chatroom") as subscriber:
+async def chatroom_ws_sender(websocket: WebSocket, game_id: int):
+    async with broadcast.subscribe(channel="game-{game_id}") as subscriber:
+        async for event in subscriber:
+            await websocket.send_text(event.message)
+
+async def lobby_ws_receiver(websocket: WebSocket):
+    async for message in websocket.iter_text():
+        await broadcast.publish(channel="lobby", message=message)
+
+async def lobby_ws_sender(websocket: WebSocket):
+    async with broadcast.subscribe(channel="lobby") as subscriber:
         async for event in subscriber:
             await websocket.send_text(event.message)
 
@@ -39,12 +48,20 @@ app = FastAPI(
     on_startup=[broadcast.connect], on_shutdown=[broadcast.disconnect]
 )
 
-@app.websocket("/api/ws/game")
+@app.websocket("/api/ws/game/{game_id}")
+async def chatroom_ws(websocket: WebSocket, game_id: int):
+    await websocket.accept()
+    await run_until_first_complete(
+        (chatroom_ws_receiver, {"websocket": websocket, "game_id": game_id}),
+        (chatroom_ws_sender, {"websocket": websocket, "game_id": game_id}),
+    )
+
+@app.websocket("/api/ws/lobby")
 async def chatroom_ws(websocket: WebSocket):
     await websocket.accept()
     await run_until_first_complete(
-        (chatroom_ws_receiver, {"websocket": websocket}),
-        (chatroom_ws_sender, {"websocket": websocket}),
+        (lobby_ws_receiver, {"websocket": websocket}),
+        (lobby_ws_sender, {"websocket": websocket}),
     )
 
 app.add_middleware(

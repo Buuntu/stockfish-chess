@@ -8,18 +8,18 @@ import { Colors } from 'types';
 import { useParams } from 'react-router';
 
 export const Game = () => {
-  let { id } = useParams<{ id: string }>();
+  let { id: gameId } = useParams<{ id: string }>();
   const [socket, setSocket] = useState<ReconnectingWebSocket | null>(null);
   const [activeGames, setActiveGames] = useState<GameType[]>([]);
 
   useEffect(() => {
-    if (!socket) {
-      connect();
-    }
-  }, [socket]);
+    connect();
+  }, [gameId]);
 
   const connect = () => {
-    setSocket(new ReconnectingWebSocket('ws://localhost:8000/api/ws/game'));
+    setSocket(
+      new ReconnectingWebSocket(`ws://localhost:8000/api/ws/game/${gameId}`)
+    );
 
     if (socket) {
       socket.onopen = () => {
@@ -47,7 +47,7 @@ export const Game = () => {
 
   return (
     <Layout
-      main={<BoardGame />}
+      main={<BoardGame socket={socket} />}
       panel={<ChatRoom socket={socket} color={Colors.WHITE} />}
     />
   );

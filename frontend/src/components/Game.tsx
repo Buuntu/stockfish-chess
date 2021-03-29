@@ -10,7 +10,7 @@ import { JoinGameDialog, GameLobby } from 'components';
 import { BACKEND_URL } from '../utils/config';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { GameType } from './types';
-import { useHistory } from 'react-router';
+import { useHistory, useParams } from 'react-router';
 
 const ChessReq: any = require('chess.js');
 
@@ -26,9 +26,14 @@ const useStyles = makeStyles({
   },
 });
 
-export const Game = () => {
+type GamePropsType = {
+  socket: ReconnectingWebSocket | null;
+};
+
+export const Game = ({ socket }: GamePropsType) => {
   const classes = useStyles();
   const history = useHistory();
+  const { id: gameId } = useParams<{ id: string }>();
 
   const [game, setGame] = useState<ChessInstance>(new ChessReq());
   const [turn, setTurn] = useState<Turn>(Turn.W);
@@ -36,14 +41,6 @@ export const Game = () => {
   const [gameType, setGameType] = useState<GameTypes | null>(null);
   const [activeGames, setActiveGames] = useState<GameType[]>([]);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
-  const [gameId, setGameId] = useState<number>(1);
-  const [socket, setSocket] = useState<ReconnectingWebSocket | null>(null);
-
-  useEffect(() => {
-    if (!socket) {
-      setSocket(new ReconnectingWebSocket('ws://localhost:8000/api/ws/game'));
-    }
-  }, [socket]);
 
   const getNextMove = async () => {
     const response = await axios.get(`${BACKEND_URL}/game`, {
@@ -92,13 +89,15 @@ export const Game = () => {
     resetGame();
 
     // generate unique ID for game (should check that it doesn't already exist)
-    setGameId(Math.floor(Math.random() * 1000));
+    const newGameId = Math.floor(Math.random() * 1000);
 
     if (socket) {
-      socket.send(JSON.stringify({ type: 'NEW_GAME', data: { id: gameId } }));
+      socket.send(
+        JSON.stringify({ type: 'NEW_GAME', data: { id: newGameId } })
+      );
     }
 
-    history.push(`/game/${gameId}`);
+    history.push(`/game/${newGameId}`);
   };
 
   if (socket) {
