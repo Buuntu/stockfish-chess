@@ -2,11 +2,14 @@ from fastapi import APIRouter, WebSocket
 
 ws_router = r = APIRouter()
 
+
 @ws_router.websocket("/lobby")
 async def websocket(websocket: WebSocket):
     await websocket.accept()
     await websocket.send_json({"msg": "Hello WebSocket"})
     await websocket.close()
+
+
 """
 async def chatroom_ws(websocket: WebSocket):
     await websocket.accept()

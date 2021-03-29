@@ -24,6 +24,7 @@ origins = [
 
 broadcast = Broadcast("memory://")
 
+
 async def chatroom_ws_receiver(websocket: WebSocket, game_id: int):
     async for message in websocket.iter_text():
         await broadcast.publish(channel=f"game-{game_id}", message=message)
@@ -34,19 +35,26 @@ async def chatroom_ws_sender(websocket: WebSocket, game_id: int):
         async for event in subscriber:
             await websocket.send_text(event.message)
 
+
 async def lobby_ws_receiver(websocket: WebSocket):
     async for message in websocket.iter_text():
         await broadcast.publish(channel="lobby", message=message)
+
 
 async def lobby_ws_sender(websocket: WebSocket):
     async with broadcast.subscribe(channel="lobby") as subscriber:
         async for event in subscriber:
             await websocket.send_text(event.message)
 
+
 app = FastAPI(
-    title=config.PROJECT_NAME, docs_url="/api/docs", openapi_url="/api", 
-    on_startup=[broadcast.connect], on_shutdown=[broadcast.disconnect]
+    title=config.PROJECT_NAME,
+    docs_url="/api/docs",
+    openapi_url="/api",
+    on_startup=[broadcast.connect],
+    on_shutdown=[broadcast.disconnect],
 )
+
 
 @app.websocket("/api/ws/game/{game_id}")
 async def chatroom_ws(websocket: WebSocket, game_id: int):
@@ -56,6 +64,7 @@ async def chatroom_ws(websocket: WebSocket, game_id: int):
         (chatroom_ws_sender, {"websocket": websocket, "game_id": game_id}),
     )
 
+
 @app.websocket("/api/ws/lobby")
 async def chatroom_ws(websocket: WebSocket):
     await websocket.accept()
@@ -63,6 +72,7 @@ async def chatroom_ws(websocket: WebSocket):
         (lobby_ws_receiver, {"websocket": websocket}),
         (lobby_ws_sender, {"websocket": websocket}),
     )
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -80,6 +90,7 @@ async def db_session_middleware(request: Request, call_next):
     response = await call_next(request)
     request.state.db.close()
     return response
+
 
 # Routers
 app.include_router(
