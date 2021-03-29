@@ -24,6 +24,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "CI=true react-scripts test",
+    "lint": "prettier --check .",
     "format": "prettier --write .",
     "eject": "react-scripts eject"
   },
