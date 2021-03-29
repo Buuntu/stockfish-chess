@@ -1,15 +1,16 @@
-import React, { FC, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Chessboard from 'chessboardjsx';
 import { makeStyles } from '@material-ui/core/styles';
 import { Button, Grid } from '@material-ui/core';
 import { ChessInstance } from 'chess.js';
 import axios from 'axios';
 
-import { GameTypes, Turn, Colors, Move } from 'types';
+import { GameTypes, Turn, Move } from 'types';
 import { JoinGameDialog, GameLobby } from 'components';
 import { BACKEND_URL } from '../utils/config';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { GameType } from './types';
+import { useHistory } from 'react-router';
 
 const ChessReq: any = require('chess.js');
 
@@ -25,8 +26,9 @@ const useStyles = makeStyles({
   },
 });
 
-export const Game: FC = () => {
+export const Game = () => {
   const classes = useStyles();
+  const history = useHistory();
 
   const [game, setGame] = useState<ChessInstance>(new ChessReq());
   const [turn, setTurn] = useState<Turn>(Turn.W);
@@ -43,15 +45,6 @@ export const Game: FC = () => {
     }
   }, [socket]);
 
-  const randomMove = (): string | null => {
-    const moves = game.moves();
-    const move = moves[Math.floor(Math.random() * moves.length)];
-    if (game.move(move) !== null) {
-      return game.fen();
-    }
-    return null;
-  };
-
   const getNextMove = async () => {
     const response = await axios.get(`${BACKEND_URL}/game`, {
       params: { board: game.fen() },
@@ -61,12 +54,6 @@ export const Game: FC = () => {
     game.load(response.data);
     setTurn(Turn.W);
   };
-
-  useEffect(() => {
-    // Changing to a new game
-    //setSocket(new WebSocket(`ws://localhost:8000/ws/chat/${gameId}/`));
-    // fetch game state from db
-  }, [gameId]);
 
   useEffect(() => {
     if (game.game_over()) return;
@@ -108,9 +95,10 @@ export const Game: FC = () => {
     setGameId(Math.floor(Math.random() * 1000));
 
     if (socket) {
-      console.log('sending message');
       socket.send(JSON.stringify({ type: 'NEW_GAME', data: { id: gameId } }));
     }
+
+    history.push(`/game/${gameId}`);
   };
 
   if (socket) {
@@ -137,49 +125,39 @@ export const Game: FC = () => {
   }
 
   return (
-    <Grid container justify="center">
-      <Grid item>
-        <div>
-          <div className={classes.board}>
-            <Chessboard
-              position={fen}
-              onDrop={onDrop}
-              transitionDuration={300}
-              draggable={gameType !== null}
-            />
-          </div>
-          <div>
-            <Button
-              className={classes.button}
-              variant="contained"
-              onClick={() => setGameType(GameTypes.STOCKFISH_ENGINE)}
-            >
-              Play a Computer
-            </Button>
-            <Button
-              className={classes.button}
-              variant="contained"
-              onClick={newGameAgainstPerson}
-            >
-              New Game
-            </Button>
-            <Button
-              className={classes.button}
-              variant="contained"
-              onClick={() => setModalOpen(true)}
-            >
-              Join Game
-            </Button>
-            <JoinGameDialog
-              open={modalOpen}
-              onClose={() => setModalOpen(false)}
-            />
-          </div>
-        </div>
-      </Grid>
-      <Grid item>
-        <GameLobby websocket={socket} games={activeGames} />
-      </Grid>
-    </Grid>
+    <div>
+      <div className={classes.board}>
+        <Chessboard
+          position={fen}
+          onDrop={onDrop}
+          transitionDuration={300}
+          draggable={gameType !== null}
+        />
+      </div>
+      <div>
+        <Button
+          className={classes.button}
+          variant="contained"
+          onClick={() => setGameType(GameTypes.STOCKFISH_ENGINE)}
+        >
+          Play a Computer
+        </Button>
+        <Button
+          className={classes.button}
+          variant="contained"
+          onClick={newGameAgainstPerson}
+        >
+          New Game
+        </Button>
+        <Button
+          className={classes.button}
+          variant="contained"
+          onClick={() => setModalOpen(true)}
+        >
+          Join Game
+        </Button>
+        <JoinGameDialog open={modalOpen} onClose={() => setModalOpen(false)} />
+      </div>
+    </div>
   );
 };

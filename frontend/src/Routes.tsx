@@ -1,7 +1,7 @@
 import { Admin } from 'admin';
-import React from 'react';
 import { Route, Switch } from 'react-router';
-import { Login, Board } from 'views';
+
+import { Login, Game, Main } from 'views';
 import { Register } from 'views/Register';
 
 export const Routes = () => {
@@ -10,10 +10,13 @@ export const Routes = () => {
       <Route path="/admin">
         <Admin />
       </Route>
-      <Route path="/">
+      <Route path="/game/:id">
+        <Game />
+      </Route>
+      <Route path="/" exact>
         <Route path="/register" component={Register}></Route>
         <Route path="/login" component={Login}></Route>
-        <Board />
+        <Main />
       </Route>
     </Switch>
   );
