@@ -22,7 +22,7 @@ origins = [
     "http://localhost:3000",
 ]
 
-broadcast = Broadcast("memory://")
+broadcast = Broadcast(os.getenv("REDIS_URL"))
 
 
 async def chatroom_ws_receiver(websocket: WebSocket, game_id: int):

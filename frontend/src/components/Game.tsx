@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import Chessboard from 'chessboardjsx';
 import { makeStyles } from '@material-ui/core/styles';
-import { Button, Grid } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import { ChessInstance } from 'chess.js';
 import axios from 'axios';
 
 import { GameTypes, Turn, Move } from 'types';
-import { JoinGameDialog, GameLobby } from 'components';
+import { JoinGameDialog } from 'components';
 import { BACKEND_URL } from '../utils/config';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { GameType } from './types';
@@ -99,29 +99,6 @@ export const Game = ({ socket }: GamePropsType) => {
 
     history.push(`/game/${newGameId}`);
   };
-
-  if (socket) {
-    socket.onopen = () => {
-      // on connecting, do nothing but log it to the console
-      console.log('connected');
-    };
-
-    socket.onclose = () => {
-      console.log('disconnected');
-      // automatically try to reconnect on connection loss
-    };
-
-    socket.onmessage = function (e) {
-      const server_message = JSON.parse(e.data);
-      console.log(server_message);
-
-      switch (server_message.type) {
-        case 'NEW_GAME':
-          setActiveGames([...activeGames, { id: server_message?.data?.id }]);
-      }
-      return false;
-    };
-  }
 
   return (
     <div>

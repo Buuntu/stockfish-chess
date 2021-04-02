@@ -52,6 +52,7 @@ services:
     environment:
       PYTHONPATH: .
       DATABASE_URL: "postgresql://postgres:password@postgres:5432/postgres"
+      REDIS_URL: "redis://redis:6379"
     depends_on:
       - "postgres"
 
