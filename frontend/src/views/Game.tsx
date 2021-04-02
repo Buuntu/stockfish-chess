@@ -10,7 +10,6 @@ import { useParams } from 'react-router';
 export const Game = () => {
   let { id: gameId } = useParams<{ id: string }>();
   const [socket, setSocket] = useState<ReconnectingWebSocket | null>(null);
-  const [activeGames, setActiveGames] = useState<GameType[]>([]);
 
   useEffect(() => {
     connect();
@@ -35,12 +34,6 @@ export const Game = () => {
       socket.onmessage = function (e) {
         const server_message = JSON.parse(e.data);
         console.log(server_message);
-
-        switch (server_message.type) {
-          case 'NEW_GAME':
-            setActiveGames([...activeGames, { id: server_message?.data?.id }]);
-        }
-        return false;
       };
     }
   };

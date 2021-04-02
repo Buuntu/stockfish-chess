@@ -16,7 +16,11 @@ export const Main = () => {
   }, [socket]);
 
   const connect = () => {
-    setSocket(new ReconnectingWebSocket('ws://localhost:8000/api/ws/lobby'));
+    const socket = new ReconnectingWebSocket(
+      'ws://localhost:8000/api/ws/lobby'
+    );
+
+    setSocket(socket);
 
     if (socket) {
       socket.onopen = () => {
@@ -32,9 +36,11 @@ export const Main = () => {
       socket.onmessage = function (e) {
         const server_message = JSON.parse(e.data);
         console.log(server_message);
+        console.log(server_message.type);
 
         switch (server_message.type) {
           case 'NEW_GAME':
+            console.log(activeGames);
             setActiveGames([...activeGames, { id: server_message?.data?.id }]);
         }
         return false;
