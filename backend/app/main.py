@@ -24,7 +24,7 @@ origins = [
     "http://localhost:3000",
 ]
 
-cvar_redis = contextvars.ContextVar('redis', default=None)
+cvar_redis = contextvars.ContextVar("redis", default=None)
 
 app = FastAPI(
     title=config.PROJECT_NAME,
@@ -32,23 +32,25 @@ app = FastAPI(
     openapi_url="/api",
 )
 
+
 @app.on_event("startup")
 async def handle_startup():
     await notifier.generator.asend(None)
     try:
         pool = await aioredis.create_pool(
-            ('redis', '6379'), encoding='utf-8', maxsize=20)
+            ("redis", "6379"), encoding="utf-8", maxsize=20
+        )
         cvar_redis.set(pool)
     except ConnectionRefusedError as e:
-        print('cannot connect to redis on: redis://redis:6379')
+        print("cannot connect to redis on: redis://redis:6379")
         return
+
 
 @app.on_event("shutdown")
 async def handle_shutdown():
     redis = cvar_redis.get()
     redis.close()
     await redis.wait_closed()
-
 
 
 app.add_middleware(
@@ -76,7 +78,12 @@ app.include_router(
     tags=["users"],
     dependencies=[Depends(get_current_active_user)],
 )
-app.include_router(ws_router, prefix="/api/ws", tags=["ws"], dependencies=[Depends(get_notifier)])
+app.include_router(
+    ws_router,
+    prefix="/api/ws",
+    tags=["ws"],
+    dependencies=[Depends(get_notifier)],
+)
 app.include_router(auth_router, prefix="/api", tags=["auth"])
 app.include_router(game_router, prefix="/api/v1", tags=["game"])
 
