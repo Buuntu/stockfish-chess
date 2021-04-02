@@ -1,10 +1,11 @@
 from fastapi import FastAPI, Depends, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.requests import Request
-from broadcaster import Broadcast
 from starlette.concurrency import run_until_first_complete
 import uvicorn
 import os
+import aioredis
+import contextvars
 
 from app.api.api_v1.routers.users import users_router
 from app.api.api_v1.routers.auth import auth_router
@@ -14,6 +15,7 @@ from app.core import config
 from app.db.schemas import WebSocketResponse, MessageTypeEnum
 from app.db.session import SessionLocal
 from app.core.auth import get_current_active_user
+from app.core.notifier import Notifier, get_notifier, notifier
 from app.core.celery_app import celery_app
 from app import tasks
 
@@ -22,56 +24,31 @@ origins = [
     "http://localhost:3000",
 ]
 
-broadcast = Broadcast("memory://")
-
-
-async def chatroom_ws_receiver(websocket: WebSocket, game_id: int):
-    async for message in websocket.iter_text():
-        await broadcast.publish(channel=f"game-{game_id}", message=message)
-
-
-async def chatroom_ws_sender(websocket: WebSocket, game_id: int):
-    async with broadcast.subscribe(channel="game-{game_id}") as subscriber:
-        async for event in subscriber:
-            await websocket.send_text(event.message)
-
-
-async def lobby_ws_receiver(websocket: WebSocket):
-    async for message in websocket.iter_text():
-        await broadcast.publish(channel="lobby", message=message)
-
-
-async def lobby_ws_sender(websocket: WebSocket):
-    async with broadcast.subscribe(channel="lobby") as subscriber:
-        async for event in subscriber:
-            await websocket.send_text(event.message)
-
+cvar_redis = contextvars.ContextVar('redis', default=None)
 
 app = FastAPI(
     title=config.PROJECT_NAME,
     docs_url="/api/docs",
     openapi_url="/api",
-    on_startup=[broadcast.connect],
-    on_shutdown=[broadcast.disconnect],
 )
 
+@app.on_event("startup")
+async def handle_startup():
+    await notifier.generator.asend(None)
+    try:
+        pool = await aioredis.create_pool(
+            ('redis', '6379'), encoding='utf-8', maxsize=20)
+        cvar_redis.set(pool)
+    except ConnectionRefusedError as e:
+        print('cannot connect to redis on: redis://redis:6379')
+        return
 
-@app.websocket("/api/ws/game/{game_id}")
-async def chatroom_ws(websocket: WebSocket, game_id: int):
-    await websocket.accept()
-    await run_until_first_complete(
-        (chatroom_ws_receiver, {"websocket": websocket, "game_id": game_id}),
-        (chatroom_ws_sender, {"websocket": websocket, "game_id": game_id}),
-    )
+@app.on_event("shutdown")
+async def handle_shutdown():
+    redis = cvar_redis.get()
+    redis.close()
+    await redis.wait_closed()
 
-
-@app.websocket("/api/ws/lobby")
-async def chatroom_ws(websocket: WebSocket):
-    await websocket.accept()
-    await run_until_first_complete(
-        (lobby_ws_receiver, {"websocket": websocket}),
-        (lobby_ws_sender, {"websocket": websocket}),
-    )
 
 
 app.add_middleware(
@@ -99,6 +76,7 @@ app.include_router(
     tags=["users"],
     dependencies=[Depends(get_current_active_user)],
 )
+app.include_router(ws_router, prefix="/api/ws", tags=["ws"], dependencies=[Depends(get_notifier)])
 app.include_router(auth_router, prefix="/api", tags=["auth"])
 app.include_router(game_router, prefix="/api/v1", tags=["game"])
 
