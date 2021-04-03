@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
 import { GameType } from 'components/types';
@@ -9,17 +9,17 @@ import { useParams } from 'react-router';
 
 export const Game = () => {
   let { id: gameId } = useParams<{ id: string }>();
-  const [socket, setSocket] = useState<ReconnectingWebSocket | null>(null);
+  const [socket, setSocket] = useState<ReconnectingWebSocket | null>(
+    new ReconnectingWebSocket(`ws://localhost:8000/api/ws/game/${gameId}`, [], {
+      maxRetries: 0,
+    })
+  );
 
   useEffect(() => {
     connect();
-  }, [gameId]);
+  }, []);
 
   const connect = () => {
-    setSocket(
-      new ReconnectingWebSocket(`ws://localhost:8000/api/ws/game/${gameId}`)
-    );
-
     if (socket) {
       socket.onopen = () => {
         // on connecting, do nothing but log it to the console

@@ -1,68 +1,73 @@
 from fastapi import APIRouter, WebSocket, Depends, WebSocketDisconnect
-from app.core.notifier import Notifier, get_notifier
+import aioredis
+import asyncio
+
 from app.core.auth import get_current_active_user
 from app.db.schemas import WebSocketResponse
 
 ws_router = r = APIRouter()
 
+async def get_redis_pool():
+    try:
+        pool = await aioredis.create_redis_pool(
+            ('redis', '6379'), encoding='utf-8')
+        return pool
+    except ConnectionRefusedError as e:
+        print('cannot connect to redis')
+        return None
 
 @ws_router.websocket("/lobby")
-async def websocket(
-    websocket: WebSocket, notifier: Notifier = Depends(get_notifier)
+async def lobby(websocket: WebSocket):
+    await websocket.accept()
+
+    await asyncio.gather(lobby_receive(websocket))
+
+
+async def lobby_receive(
+    websocket: WebSocket
 ):
-    user_id = "guest"
-    await notifier.connect(websocket, user_id)
-    try:
-        while True:
-            response = await websocket.receive_json()
-            if "type" in response and "data" in response:
-                await notifier.push(
-                    WebSocketResponse(
-                        type=response["type"],
-                        data=response["data"],
-                    )
-                )
-    except WebSocketDisconnect:
-        await notifier.remove(websocket, user_id)
+    pool = await get_redis_pool()
+    first_run = True
+    latest_ids = ['$']
+
+    while True and pool:
+        if first_run:
+            events = await pool.xread(['lobby'])
+            for _, e_id, e in events:
+                # print(e)
+                await websocket.send_json(e)
+                latest_ids = [e_id]
+            first_run = False
+        else:
+            events = await pool.xread(
+                ["lobby"],
+                latest_ids=latest_ids
+            )
+            for _, e_id, e in events:
+                # print(e)
+                await websocket.send_json(e)
+                latest_ids = [e_id]
+
+
+    pool.close()
 
 
 @ws_router.websocket("/game/{game_id}")
 async def websocket_game(
     game_id: int,
     websocket: WebSocket,
-    notifier: Notifier = Depends(get_notifier),
 ):
-    await notifier.connect(websocket, "guest")
     try:
-        while True:
-            response = await websocket.receive_json()
-            if "type" in response and "data" in response:
-                await notifier.push(
-                    WebSocketResponse(
-                        type=response["type"],
-                        data=response["data"],
-                    )
-                )
-    except WebSocketDisconnect:
-        await notifier.remove(websocket, "guest")
+        await websocket.accept()
 
+        pool = await get_redis_pool()
 
-"""
-async def chatroom_ws(websocket: WebSocket):
-    await websocket.accept()
-    await run_until_first_complete(
-        (chatroom_ws_receiver, {"websocket": websocket}),
-        (chatroom_ws_sender, {"websocket": websocket}),
-    )
+        await pool.xadd('lobby', fields={ 'game_id': game_id })
 
+        return
+    except:
+        await websocket.close()
+        pool.close()
 
-async def chatroom_ws_receiver(websocket):
-    async for message in websocket.iter_text():
-        await broadcast.publish(channel="lobby", message=message)
+    pool.close()
 
-
-async def chatroom_ws_sender(websocket):
-    async with broadcast.subscribe(channel="lobby") as subscriber:
-        async for event in subscriber:
-            await websocket.send_text(event.message)
-"""
