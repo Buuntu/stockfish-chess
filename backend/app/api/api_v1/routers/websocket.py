@@ -1,6 +1,7 @@
 from fastapi import APIRouter, WebSocket, Depends, WebSocketDisconnect
 import aioredis
 import asyncio
+import logging
 
 from app.core.auth import get_current_active_user
 from app.db.schemas import WebSocketResponse
@@ -32,9 +33,10 @@ async def lobby_receive(
 
     while True and pool:
         if first_run:
-            events = await pool.xread(['lobby'])
-            for _, e_id, e in events:
-                # print(e)
+            events = await pool.xrevrange('lobby')
+            events.reverse()
+
+            for e_id, e in events:
                 await websocket.send_json(e)
                 latest_ids = [e_id]
             first_run = False
@@ -44,10 +46,32 @@ async def lobby_receive(
                 latest_ids=latest_ids
             )
             for _, e_id, e in events:
-                # print(e)
                 await websocket.send_json(e)
                 latest_ids = [e_id]
 
+
+    pool.close()
+
+async def game_receive(websocket: WebSocket, game_id: int):
+    pool = await get_redis_pool()
+    first_run = True
+    ws_connected = True
+    logger = logging.getLogger("api")
+
+    while ws_connected:
+        try:
+            if first_run:
+                stream_event_id = await pool.xadd('lobby', fields={ 'game_id': game_id })
+
+                first_run = False
+                return
+        except WebSocketDisconnect:
+            logger.debug('disconnected from game', game_id)
+            print('disconnected from game', game_id)
+            if stream_event_id:
+                await pool.xdel(stream_event_id)
+            await websocket.close()
+            ws_connected = False
 
     pool.close()
 
@@ -57,17 +81,9 @@ async def websocket_game(
     game_id: int,
     websocket: WebSocket,
 ):
-    try:
-        await websocket.accept()
+    await websocket.accept()
 
-        pool = await get_redis_pool()
+    await asyncio.gather(game_receive(websocket, game_id))
 
-        await pool.xadd('lobby', fields={ 'game_id': game_id })
-
-        return
-    except:
-        await websocket.close()
-        pool.close()
-
-    pool.close()
+    
 
