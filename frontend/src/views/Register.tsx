@@ -52,13 +52,13 @@ export const Register = () => {
           history.push('/');
         }
       } catch (err) {
-        if (err instanceof Error) {
-          // handle errors thrown from frontend
-          setError(err.message);
-        } else {
-          // handle errors thrown from backend
-          setError(err);
-        }
+        // if (err instanceof Error) {
+        //   // handle errors thrown from frontend
+        //   setError(err.message);
+        // } else {
+        //   // handle errors thrown from backend
+        //   setError(err);
+        // }
       }
     }
   };

@@ -5,20 +5,19 @@
     "@material-ui/core": "^4.11.3",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.57",
-    "axios": "^0.21.1",
+    "axios": "^1.7.7",
     "chess.js": "^0.11.0",
-    "chessboardjsx": "^2.4.2",
+    "chessboardjsx": "^2.4.7",
     "jwt-decode": "^3.1.2",
-    "node-sass": "^4.13.1",
     "ra-data-json-server": "^3.13.5",
     "ra-data-simple-rest": "^3.13.4",
     "react": "^16.13.1",
     "react-admin": "^3.5.2",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "^4.0.3",
     "reconnecting-websocket": "^4.4.0",
-    "standard": "^16.0.3"
+    "sass": "^1.80.6",
+    "standard": "^16.0.4"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -52,7 +51,7 @@
     "@types/react-dom": "^17.0.3",
     "@types/react-router-dom": "^5.1.7",
     "prettier": "^2.2.1",
-    "react-scripts": "4.0.3",
+    "react-scripts": "^5.0.1",
     "react-test-renderer": "^16.13.1",
     "typescript": "^4.2.3"
   }
